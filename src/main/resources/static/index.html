@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltChat // Salas General, Deportes y Musica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --void-black: #030407;
+            --obsidian: #080b11;
+            --graphite-dark: #0e131d;
+            --graphite-mid: #151c29;
+            --graphite-light: #1e2738;
+            --volt-blue: #38bdf8;
+            --volt-deep: #2563eb;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--void-black);
+            color: #d4dbe6;
+            overflow-x: hidden;
+        }
+
+        .font-display-soft {
+            font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.015em;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .obsidian-stage {
+            background-color: #030407;
+            background-image:
+                    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.14), transparent 52%),
+                    radial-gradient(circle at 12% 85%, rgba(56, 189, 248, 0.06), transparent 40%),
+                    linear-gradient(to right, rgba(148, 163, 184, 0.025) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(148, 163, 184, 0.025) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        @keyframes electricPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.22), 0 10px 30px -10px rgba(37, 99, 235, 0.35);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45), 0 12px 38px -8px rgba(56, 189, 248, 0.35);
+            }
+        }
+
+        @keyframes arcSweep {
+            0% { transform: translateX(-120%) skewX(-18deg); }
+            100% { transform: translateX(260%) skewX(-18deg); }
+        }
+
+        @keyframes bubbleArrive {
+            from { opacity: 0; transform: translateY(7px) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .electric-card {
+            animation: electricPulse 3.8s infinite ease-in-out;
+        }
+
+        .arc-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arc-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 38%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(186, 230, 253, 0.32), transparent);
+            animation: arcSweep 3.4s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .bubble-arrive {
+            animation: bubbleArrive 0.2s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2636;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8;
+        }
+    </style>
+</head>
+<body class="obsidian-stage min-h-screen text-slate-200" onclick="closeContextMenus()">
+
+<!-- BARRA SUPERIOR -->
+<header class="sticky top-0 z-30 h-16 px-4 md:px-6 bg-[#06080d]/95 backdrop-blur-md border-b border-zinc-800/90 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-2xl bg-[#111724] border border-sky-400/45 flex items-center justify-center shadow-[0_0_16px_rgba(56,189,248,0.25)]">
+            <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+        </div>
+        <div class="flex items-baseline gap-2.5">
+            <span class="font-display-soft text-xl font-bold tracking-tight text-white">Volt<span class="text-sky-400">Chat</span></span>
+            <span class="hidden sm:inline-block text-[11px] mono px-2.5 py-0.5 rounded-full bg-zinc-900 text-sky-300/90 border border-sky-500/25">WS 8860</span>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0d111a] border border-zinc-800 text-xs font-semibold">
+            <span id="ws-dot" class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]"></span>
+            <span id="online-badge" class="text-zinc-300 mono">0 en linea</span>
+        </div>
+        <button onclick="openNewWindow()" title="Abrir otra ventana de prueba" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0e131d] hover:bg-[#161e2e] border border-zinc-700/80 hover:border-sky-400/50 text-xs font-semibold text-zinc-200 hover:text-sky-300 transition cursor-pointer">
+            <span>+ Ventana</span>
+        </button>
+    </div>
+</header>
+
+<!-- LOBBY DE INGRESO -->
+<section id="lobby-view" class="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 py-10">
+    <div class="max-w-4xl w-full text-center mb-8">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0d121c] border border-zinc-800 text-xs mono text-zinc-400 mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+            <span id="ws-endpoint-label" class="text-sky-300/90"></span>
+        </div>
+        <h1 class="font-display-soft text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-3.5">
+            Conecta. <span class="text-sky-400 drop-shadow-[0_0_18px_rgba(56,189,248,0.28)]">Conversa.</span> Comparte.
+        </h1>
+        <p class="text-zinc-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+            Explora las salas <span class="text-zinc-200 font-semibold">General</span>, <span class="text-zinc-200 font-semibold">Deportes</span> y <span class="text-zinc-200 font-semibold">Musica</span>, o crea tus propias salas publicas y privadas con PIN de 4 digitos.
+        </p>
+    </div>
+
+    <!-- Salas disponibles justo debajo del titulo y descripcion -->
+    <div class="w-full max-w-4xl mb-8">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="font-display-soft text-sm font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+                Salas disponibles
+            </h2>
+            <span class="text-xs text-zinc-500 mono">General · Deportes · Musica</span>
+        </div>
+        <div id="lobby-rooms-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- Formulario para ingresar: Nombre, Nacionalidad, Codigo e Ingresar -->
+    <div class="w-full max-w-4xl bg-[#0b0e15] border border-zinc-800/95 rounded-3xl p-5 md:p-6 electric-card">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <div class="md:col-span-4">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Tu nombre (solo letras)</label>
+                <input id="input-name" type="text" maxlength="30" placeholder="Ej: Andres Lopez"
+                       class="w-full px-4 py-2.5 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 outline-none text-sm text-white placeholder-zinc-600 transition">
+            </div>
+            <div class="md:col-span-3">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Nacionalidad / Pais</label>
+                <div class="relative flex items-center">
+                    <span id="lobby-flag-preview" class="absolute left-3.5 pointer-events-none flex items-center"></span>
+                    <select id="input-nationality" onchange="updateLobbyFlagPreview()" class="w-full pl-11 pr-3 py-2.5 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 outline-none text-sm text-white transition">
+                        <option value="Colombia" selected>Colombia</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Chile">Chile</option>
+                        <option value="Peru">Peru</option>
+                        <option value="Espana">Espana</option>
+                        <option value="Estados Unidos">Estados Unidos</option>
+                        <option value="Venezuela">Venezuela</option>
+                        <option value="Uruguay">Uruguay</option>
+                        <option value="Brasil">Brasil</option>
+                    </select>
+                </div>
+            </div>
+            <div class="md:col-span-3">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-300 mb-1.5">Codigo de acceso</label>
+                <input id="input-access-code" type="text" maxlength="24" placeholder="Ej: CLAVE2026"
+                       class="w-full px-4 py-2.5 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 outline-none text-sm text-white mono placeholder-zinc-600 transition">
+            </div>
+            <div class="md:col-span-2">
+                <button id="btn-enter" onclick="enterChat()" class="arc-btn w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-zinc-950 font-extrabold text-sm tracking-wide shadow-[0_0_20px_rgba(56,189,248,0.28)] transition cursor-pointer">
+                    Ingresar
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PANTALLA GENERAL DEL CHAT -->
+<main id="chat-view" class="hidden h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-12 bg-[#04060a] relative">
+
+    <!-- LADO IZQUIERDO: SALAS Y PERFIL -->
+    <aside class="lg:col-span-3 bg-[#080b12] border-r border-zinc-800/90 flex flex-col justify-between h-full overflow-hidden">
+        <div class="p-4 pb-20 flex flex-col gap-3 overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <span class="font-display-soft text-xs font-semibold uppercase tracking-wider text-zinc-400">Salas</span>
+                <button onclick="openCreateRoomModal()" class="px-3 py-1 rounded-full bg-[#111724] hover:bg-[#172033] border border-sky-400/35 text-sky-300 text-xs font-bold transition cursor-pointer">
+                    + Nueva Sala
+                </button>
+            </div>
+
+            <div id="sidebar-rooms-list" class="flex flex-col gap-1.5"></div>
+
+            <button onclick="openJoinCodeModal()" class="mt-2 w-full py-2.5 px-3.5 rounded-2xl bg-[#0d121c] hover:bg-[#131a28] border border-zinc-800 hover:border-sky-400/40 text-zinc-200 hover:text-sky-300 text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer">
+                <span>Unirse a la sala por codigo</span>
+            </button>
+        </div>
+
+        <!-- Perfil del usuario -->
+        <div class="p-3.5 bg-[#05070c] border-t border-zinc-800/90 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8] shrink-0"></span>
+                    <p id="my-profile-name" class="text-sm font-bold text-white truncate">Usuario</p>
+                </div>
+                <p id="my-profile-country" class="text-xs text-zinc-400 truncate pl-4 flex items-center gap-1.5 mt-0.5"></p>
+                <p id="my-profile-code" class="text-[11px] text-sky-300/80 mono truncate pl-4 mt-0.5"></p>
+            </div>
+            <button onclick="logoutToLobby()" title="Volver al inicio" class="px-3 py-1.5 rounded-xl bg-[#0e131d] hover:bg-zinc-800 border border-zinc-800 text-xs font-semibold text-zinc-300 hover:text-white transition cursor-pointer">
+                Salir
+            </button>
+        </div>
+    </aside>
+
+    <!-- ZONA PRINCIPAL DERECHA -->
+    <section class="lg:col-span-9 flex flex-col h-full bg-[#04060a] relative">
+
+        <!-- Boton flotante desplegable de conectados arriba a la derecha -->
+        <div class="fixed top-20 right-5 z-30 flex flex-col items-end" onclick="event.stopPropagation()">
+            <button id="btn-toggle-members" onclick="toggleMembersDropdown()" class="arc-btn px-4 py-2 rounded-full bg-[#0c111b]/95 hover:bg-[#121927] border border-sky-400/40 text-sky-300 text-xs font-bold shadow-[0_8px_25px_rgba(0,0,0,0.65),0_0_18px_rgba(56,189,248,0.22)] backdrop-blur-md flex items-center gap-2 transition cursor-pointer">
+                <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+                <span>Conectados</span>
+                <span id="room-members-count" class="px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-200 mono text-[11px]">0</span>
+                <span id="members-chevron" class="text-zinc-400 text-[10px]">▼</span>
+            </button>
+
+            <!-- Panel desplegable de personas conectadas -->
+            <div id="members-dropdown-panel" class="hidden mt-2 w-72 max-h-96 overflow-y-auto rounded-3xl bg-[#0b0e15]/98 border border-zinc-800 shadow-[0_16px_45px_rgba(0,0,0,0.85)] p-3.5 pb-16 backdrop-blur-md">
+                <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-zinc-800/90">
+                    <span class="font-display-soft text-xs font-semibold uppercase tracking-wider text-zinc-400">En esta sala</span>
+                    <span class="text-[11px] mono text-sky-400">En vivo</span>
+                </div>
+                <div id="room-members-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- Cabecera de sala -->
+        <div class="px-5 py-3.5 pr-44 bg-[#080b12]/95 border-b border-zinc-800/90 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <span id="active-room-icon" class="flex items-center"></span>
+                    <h2 id="active-room-title" class="font-display-soft text-lg font-bold text-white">General</h2>
+                    <span id="active-room-badge" class="px-2.5 py-0.5 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-xs mono">En linea 0</span>
+                    <span id="active-room-code" class="px-2.5 py-0.5 rounded-full bg-[#0e131d] border border-zinc-800 text-zinc-400 text-[11px] mono"></span>
+                </div>
+                <p id="active-room-topic" class="text-xs text-zinc-400 truncate mt-0.5">Conversacion abierta entre todos los usuarios conectados</p>
+            </div>
+        </div>
+
+        <!-- Lista de mensajes -->
+        <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3">
+            <div class="flex justify-center">
+                <span class="px-3.5 py-1 rounded-full bg-[#0d121c] border border-zinc-800 text-[11px] mono text-zinc-400">Hoy</span>
+            </div>
+            <div id="empty-room-state" class="text-center py-16 text-zinc-500 text-sm">
+                Aun no hay mensajes en esta sala. Se el primero en escribir.
+            </div>
+        </div>
+
+        <!-- Picker de Emojis y GIFs -->
+        <div id="media-picker" class="hidden mx-4 mb-2 w-80 max-w-[calc(100%-2rem)] bg-[#0c1019] border border-sky-400/35 rounded-3xl shadow-2xl overflow-hidden z-20" onclick="event.stopPropagation()">
+            <div class="grid grid-cols-2 border-b border-zinc-800 text-xs font-bold">
+                <button id="tab-emojis" onclick="switchMediaTab('emojis')" class="py-2.5 text-sky-400 border-b-2 border-sky-400 bg-sky-500/5 cursor-pointer">Emojis</button>
+                <button id="tab-gifs" onclick="switchMediaTab('gifs')" class="py-2.5 text-zinc-400 hover:text-zinc-200 cursor-pointer">GIFs</button>
+            </div>
+            <div id="picker-emojis-grid" class="p-3 grid grid-cols-7 gap-1.5 text-xl"></div>
+            <div id="picker-gifs-grid" class="hidden p-3 grid-cols-2 gap-2 max-h-52 overflow-y-auto"></div>
+        </div>
+
+        <!-- Barra inferior de envio -->
+        <div class="p-3.5 bg-[#080b12] border-t border-zinc-800/90 flex items-center gap-2">
+            <input id="input-message" type="text" onkeydown="handleMessageKey(event)" placeholder="Escribe un mensaje..."
+                   class="flex-1 px-4 py-2.5 rounded-2xl bg-[#04060a] border border-zinc-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 outline-none text-sm text-white placeholder-zinc-600 transition">
+            <button onclick="event.stopPropagation(); toggleMediaPicker('emojis')" title="Emojis" class="px-3 py-2.5 rounded-2xl bg-[#0e131d] hover:bg-[#161e2e] border border-zinc-800 text-xs font-bold text-zinc-300 cursor-pointer">
+                :)
+            </button>
+            <button onclick="event.stopPropagation(); toggleMediaPicker('gifs')" title="GIFs" class="px-3 py-2.5 rounded-2xl bg-[#0e131d] hover:bg-[#161e2e] border border-zinc-800 text-xs font-bold text-sky-400 mono cursor-pointer">
+                GIF
+            </button>
+            <button onclick="sendTextMessage()" class="arc-btn px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-zinc-950 font-extrabold text-sm transition cursor-pointer">
+                Enviar
+            </button>
+        </div>
+    </section>
+</main>
+
+<!-- MODAL: CREAR SALA -->
+<div id="modal-create-room" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="event.stopPropagation()">
+    <div class="w-full max-w-md bg-[#0b0e15] border border-zinc-800 rounded-3xl p-6 electric-card">
+        <h3 class="font-display-soft text-xl font-bold text-white mb-1">Crear sala personalizada</h3>
+        <p class="text-xs text-zinc-400 mb-4">Quedara vinculada a tu nombre, nacionalidad y codigo de acceso.</p>
+
+        <div class="space-y-3.5">
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Icono de la sala</label>
+                <div id="create-icon-selector" class="grid grid-cols-6 gap-2 bg-[#05070c] p-2.5 rounded-2xl border border-zinc-800"></div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Nombre de la sala</label>
+                <input id="new-room-name" type="text" maxlength="35" placeholder="Ej: Sala Privada VIP"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Tema o descripcion</label>
+                <input id="new-room-topic" type="text" maxlength="80" placeholder="Ej: Conversacion exclusiva"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Privacidad de la sala</label>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button id="priv-public" type="button" onclick="setRoomPrivacy('public')" class="py-2.5 px-3 rounded-2xl border border-sky-400/70 bg-sky-500/10 text-sky-300 text-xs font-bold cursor-pointer">
+                        Publica (Codigo)
+                    </button>
+                    <button id="priv-private" type="button" onclick="setRoomPrivacy('private')" class="py-2.5 px-3 rounded-2xl border border-zinc-800 bg-[#05070c] text-zinc-400 text-xs font-bold cursor-pointer">
+                        Privada (Codigo + PIN 4)
+                    </button>
+                </div>
+            </div>
+            <div id="pin-field-wrapper" class="hidden">
+                <label class="block text-xs font-bold text-sky-300 uppercase mb-1">PIN de acceso (4 digitos)</label>
+                <input id="new-room-pin" type="text" maxlength="4" placeholder="Ej: 7391"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white mono">
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-2.5">
+            <button onclick="closeCreateRoomModal()" class="px-4 py-2 rounded-2xl bg-[#111622] hover:bg-[#182032] text-zinc-300 text-xs font-bold cursor-pointer">Cancelar</button>
+            <button onclick="submitCreateRoom()" class="px-4 py-2 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-zinc-950 text-xs font-extrabold cursor-pointer">Crear sala</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: EDITAR SALA -->
+<div id="modal-edit-room" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="event.stopPropagation()">
+    <div class="w-full max-w-md bg-[#0b0e15] border border-zinc-800 rounded-3xl p-6 electric-card">
+        <h3 class="font-display-soft text-xl font-bold text-white mb-1">Editar sala</h3>
+        <p id="edit-room-subtitle" class="text-xs text-zinc-400 mb-4">Modifica los datos y la privacidad de tu sala.</p>
+
+        <div class="space-y-3.5">
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Icono de la sala</label>
+                <div id="edit-icon-selector" class="grid grid-cols-6 gap-2 bg-[#05070c] p-2.5 rounded-2xl border border-zinc-800"></div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Nombre de la sala</label>
+                <input id="edit-room-name" type="text" maxlength="35"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Descripcion</label>
+                <input id="edit-room-topic" type="text" maxlength="80"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Privacidad de la sala</label>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button id="edit-priv-public" type="button" onclick="setEditRoomPrivacy('public')" class="py-2.5 px-3 rounded-2xl border border-sky-400/70 bg-sky-500/10 text-sky-300 text-xs font-bold cursor-pointer">
+                        Publica (Sin PIN)
+                    </button>
+                    <button id="edit-priv-private" type="button" onclick="setEditRoomPrivacy('private')" class="py-2.5 px-3 rounded-2xl border border-zinc-800 bg-[#05070c] text-zinc-400 text-xs font-bold cursor-pointer">
+                        Privada (Con PIN 4)
+                    </button>
+                </div>
+            </div>
+            <div id="edit-pin-wrapper" class="hidden">
+                <label class="block text-xs font-bold text-sky-300 uppercase mb-1">PIN de acceso (4 digitos)</label>
+                <input id="edit-room-pin" type="text" maxlength="4" placeholder="Ej: 7391"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white mono">
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-2.5">
+            <button onclick="closeEditRoomModal()" class="px-4 py-2 rounded-2xl bg-[#111622] hover:bg-[#182032] text-zinc-300 text-xs font-bold cursor-pointer">Cancelar</button>
+            <button onclick="submitEditRoom()" class="px-4 py-2 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-zinc-950 text-xs font-extrabold cursor-pointer">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: UNIRSE POR CODIGO Y PIN -->
+<div id="modal-join-code" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="event.stopPropagation()">
+    <div class="w-full max-w-sm bg-[#0b0e15] border border-zinc-800 rounded-3xl p-6 electric-card">
+        <h3 class="font-display-soft text-xl font-bold text-white mb-1">Entrar con codigo y PIN</h3>
+        <p class="text-xs text-zinc-400 mb-4">Escribe el codigo de la sala y, si es privada, su PIN de 4 digitos para desbloquearla.</p>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Codigo de la sala</label>
+                <input id="join-code-input" type="text" placeholder="Ej: SALA-7391"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white mono uppercase">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-sky-300 uppercase mb-1">PIN de 4 digitos (salas privadas)</label>
+                <input id="join-pin-input" type="text" maxlength="4" placeholder="Ej: 7391"
+                       class="w-full px-3.5 py-2 rounded-2xl bg-[#05070c] border border-zinc-800 focus:border-sky-400 outline-none text-sm text-white mono">
+            </div>
+        </div>
+        <div class="mt-5 flex justify-end gap-2">
+            <button onclick="closeJoinCodeModal()" class="px-4 py-2 rounded-2xl bg-[#111622] text-zinc-300 text-xs font-bold cursor-pointer">Cancelar</button>
+            <button onclick="submitJoinByCode()" class="px-4 py-2 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-zinc-950 text-xs font-extrabold cursor-pointer">Entrar a la sala</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ALERTA / INFO -->
+<div id="modal-alert" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="event.stopPropagation()">
+    <div class="w-full max-w-sm bg-[#0b0e15] border border-zinc-800 rounded-3xl p-6">
+        <h3 id="alert-title" class="font-display-soft text-lg font-bold text-sky-400 mb-2">Aviso</h3>
+        <p id="alert-body" class="text-sm text-zinc-300 mb-5"></p>
+        <div class="flex justify-end">
+            <button onclick="closeAlertModal()" class="px-4 py-2 rounded-2xl bg-sky-500 hover:bg-sky-400 text-zinc-950 text-xs font-extrabold cursor-pointer">Entendido</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsHost = window.location.host || "localhost:8860";
+    const WS_URL = wsProtocol + "//" + wsHost + "/network-monitor";
+    document.getElementById("ws-endpoint-label").textContent = WS_URL;
+
+    function flagSvgHtml(country) {
+        var base = 'class="w-5 h-3.5 rounded-[2px] inline-block shrink-0 border border-white/15" viewBox="0 0 24 16"';
+        if (country === "Colombia" || country === "Venezuela" || country === "Ecuador") {
+            return '<svg ' + base + '><rect width="24" height="8" fill="#FACC15"/><rect y="8" width="24" height="4" fill="#1D4ED8"/><rect y="12" width="24" height="4" fill="#DC2626"/></svg>';
+        }
+        if (country === "Mexico" || country === "Italia") {
+            return '<svg ' + base + '><rect width="8" height="16" fill="#16A34A"/><rect x="8" width="8" height="16" fill="#FFFFFF"/><rect x="16" width="8" height="16" fill="#DC2626"/></svg>';
+        }
+        if (country === "Argentina" || country === "Uruguay") {
+            return '<svg ' + base + '><rect width="24" height="5.3" fill="#38BDF8"/><rect y="5.3" width="24" height="5.4" fill="#FFFFFF"/><rect y="10.7" width="24" height="5.3" fill="#38BDF8"/><circle cx="12" cy="8" r="2.2" fill="#FACC15"/></svg>';
+        }
+        if (country === "Peru" || country === "Canada") {
+            return '<svg ' + base + '><rect width="7" height="16" fill="#DC2626"/><rect x="7" width="10" height="16" fill="#FFFFFF"/><rect x="17" width="7" height="16" fill="#DC2626"/></svg>';
+        }
+        if (country === "Chile") {
+            return '<svg ' + base + '><rect width="10" height="8" fill="#1D4ED8"/><rect x="10" width="14" height="8" fill="#FFFFFF"/><rect y="8" width="24" height="8" fill="#DC2626"/></svg>';
+        }
+        if (country === "Espana") {
+            return '<svg ' + base + '><rect width="24" height="4" fill="#DC2626"/><rect y="4" width="24" height="8" fill="#FACC15"/><rect y="12" width="24" height="4" fill="#DC2626"/></svg>';
+        }
+        if (country === "Brasil") {
+            return '<svg ' + base + '><rect width="24" height="16" fill="#16A34A"/><polygon points="12,2 21,8 12,14 3,8" fill="#FACC15"/><circle cx="12" cy="8" r="3.4" fill="#1D4ED8"/></svg>';
+        }
+        if (country === "Estados Unidos") {
+            return '<svg ' + base + '><rect width="24" height="16" fill="#DC2626"/><rect y="3.2" width="24" height="3.2" fill="#FFFFFF"/><rect y="9.6" width="24" height="3.2" fill="#FFFFFF"/><rect width="11" height="8.5" fill="#1D4ED8"/></svg>';
+        }
+        return '<svg ' + base + '><rect width="24" height="16" fill="#1E293B"/><circle cx="12" cy="8" r="4.5" stroke="#38BDF8" stroke-width="1.5" fill="none"/></svg>';
+    }
+
+    function roomIconHtml(iconKey, sizeClass, roomId) {
+        var cls = sizeClass || "w-4 h-4";
+        var key = iconKey || "";
+        if (roomId === "musica" || key === "music") {
+            return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zm12-2a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
+        }
+        if (roomId === "deportes" || key === "trophy") {
+            return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3a9 9 0 000 18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></svg>';
+        }
+        if (key === "gamepad") {
+            return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h4m-2-2v4m7-1h.01M18 11h.01M5 7h14a3 3 0 013 3v4a4 4 0 01-4 4l-2-2H8l-2 2a4 4 0 01-4-4v-4a3 3 0 013-3z"/></svg>';
+        }
+        if (key === "code") {
+            return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>';
+        }
+        if (key === "flame") {
+            return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>';
+        }
+        if (key === "shield") {
+            return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/></svg>';
+        }
+        return '<svg class="' + cls + ' text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 11-15.45 3.1L3 20l4.9-1.55A8 8 0 0120 12z"/></svg>';
+    }
+
+    const ROOM_ICON_OPTIONS = ["chat", "music", "trophy", "gamepad", "code", "flame"];
+
+    const EMOJIS = [
+        "⚡", "🔥", "🚀", "💻", "🎧", "⚽", "🏆",
+        "😎", "🤝", "👏", "🎯", "🧠", "🛡️", "✨",
+        "😂", "🤩", "🙌", "💪", "🎸", "🏟️", "📌"
+    ];
+
+    const GIFS = [
+        { label: "Energia azul", url: "https://media.giphy.com/media/3o7abAHdWRiWnBiTx5/giphy.gif" },
+        { label: "Modo turbo", url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" },
+        { label: "Golazo", url: "https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif" },
+        { label: "Celebracion", url: "https://media.giphy.com/media/g9582DNuQppxC/giphy.gif" }
+    ];
+
+    let socket = null;
+    let mySessionId = null;
+    let myName = "";
+    let myNationality = "Colombia";
+    let myAccessCode = "";
+    let currentRoomId = "general";
+    let selectedPrivacy = "public";
+    let selectedRoomIconKey = "gamepad";
+    let editingRoomId = null;
+    let editingRoomPrivacy = "public";
+    let editingRoomIconKey = "gamepad";
+    let latestRooms = [];
+    let latestUsers = [];
+    let unlockedPrivateRooms = {};
+
+    function updateLobbyFlagPreview() {
+        var c = document.getElementById("input-nationality").value;
+        document.getElementById("lobby-flag-preview").innerHTML = flagSvgHtml(c);
+    }
+
+    function connectSocket(onReady) {
+        if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+            if (onReady) onReady();
+            return;
+        }
+        socket = new WebSocket(WS_URL);
+
+        socket.onopen = function () {
+            const dot = document.getElementById("ws-dot");
+            dot.className = "w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]";
+            if (onReady) onReady();
+        };
+
+        socket.onmessage = function (event) {
+            handleServerEvent(event.data);
+        };
+
+        socket.onclose = function () {
+            const dot = document.getElementById("ws-dot");
+            dot.className = "w-2 h-2 rounded-full bg-zinc-500";
+        };
+
+        socket.onerror = function () {
+            showAlert("Error de conexion", "No se pudo conectar con el servidor WebSocket en " + WS_URL + ". Verifica que el servidor Java este corriendo.");
+        };
+    }
+
+    function sendJson(obj) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify(obj));
+        }
+    }
+
+    function handleServerEvent(raw) {
+        let data;
+        try {
+            data = JSON.parse(raw);
+        } catch (e) {
+            return;
+        }
+
+        if (data.type === "STATE_SYNC") {
+            latestRooms = data.rooms || [];
+            latestUsers = data.users || [];
+            document.getElementById("online-badge").textContent = data.totalOnline + " en linea";
+
+            var currentRoom = latestRooms.find(function (r) { return r.id === currentRoomId; });
+            if (!currentRoom) {
+                currentRoomId = "general";
+                resetMessagesArea();
+            }
+
+            renderLobbyRooms();
+            renderSidebarRooms();
+            renderActiveRoomHeader();
+            renderRoomMembers();
+        } else if (data.type === "REGISTERED") {
+            mySessionId = data.sessionId;
+            myName = data.name;
+            myNationality = data.nationality;
+            myAccessCode = data.accessCode || "";
+            currentRoomId = data.roomId;
+
+            document.getElementById("my-profile-name").textContent = myName;
+            document.getElementById("my-profile-country").innerHTML = flagSvgHtml(myNationality) + '<span>' + escapeHtml(myNationality) + '</span>';
+            document.getElementById("my-profile-code").textContent = "Codigo: " + myAccessCode;
+            document.getElementById("lobby-view").classList.add("hidden");
+            document.getElementById("chat-view").classList.remove("hidden");
+            resetMessagesArea();
+            renderSidebarRooms();
+            renderActiveRoomHeader();
+            renderRoomMembers();
+        } else if (data.type === "ROOM_CREATED") {
+            currentRoomId = data.roomId;
+            if (data.privacy === "private") {
+                unlockedPrivateRooms[data.roomId] = true;
+            }
+            resetMessagesArea();
+            var info = "Codigo de sala: " + data.code;
+            if (data.privacy === "private") {
+                info = info + " | PIN de 4 digitos: " + data.pin;
+            }
+            showAlert("Sala creada", "Tu sala '" + data.roomName + "' esta lista. " + info);
+        } else if (data.type === "ROOM_UNLOCKED") {
+            if (data.privacy === "private") {
+                unlockedPrivateRooms[data.roomId] = true;
+            }
+            currentRoomId = data.roomId;
+            resetMessagesArea();
+            renderSidebarRooms();
+            renderActiveRoomHeader();
+            renderRoomMembers();
+        } else if (data.type === "CHAT_MESSAGE") {
+            if (data.roomId === currentRoomId) {
+                appendChatMessage(data);
+            }
+        } else if (data.type === "SYSTEM_EVENT") {
+            if (data.roomId === currentRoomId) {
+                appendSystemEvent(data.text);
+            }
+        } else if (data.type === "KICKED_NOTICE" || data.type === "BANNED_NOTICE") {
+            delete unlockedPrivateRooms[data.roomId];
+            showAlert("Aviso de sala", data.reason);
+            if (currentRoomId === data.roomId) {
+                currentRoomId = "general";
+                resetMessagesArea();
+            }
+        } else if (data.type === "ROOM_DELETED_NOTICE") {
+            showAlert("Sala eliminada", data.text);
+            currentRoomId = "general";
+            resetMessagesArea();
+        } else if (data.type === "ERROR") {
+            showAlert("Atencion", data.message);
+        }
+    }
+
+    function enterChat(preselectedRoom) {
+        const nameInput = document.getElementById("input-name").value.trim();
+        const country = document.getElementById("input-nationality").value;
+        const codeInput = document.getElementById("input-access-code").value.trim();
+        const targetRoom = preselectedRoom || currentRoomId || "general";
+
+        if (!nameInput) {
+            showAlert("Nombre requerido", "Escribe tu nombre (solo letras) para entrar al chat.");
+            return;
+        }
+        if (!codeInput) {
+            showAlert("Codigo requerido", "Escribe tu codigo de acceso para ingresar.");
+            return;
+        }
+
+        connectSocket(function () {
+            sendJson({
+                type: "REGISTER",
+                name: nameInput,
+                nationality: country,
+                accessCode: codeInput,
+                roomId: targetRoom
+            });
+        });
+    }
+
+    function logoutToLobby() {
+        sendJson({ type: "LOGOUT" });
+        mySessionId = null;
+        myName = "";
+        myAccessCode = "";
+        currentRoomId = "general";
+        unlockedPrivateRooms = {};
+        closeContextMenus();
+        document.getElementById("members-dropdown-panel").classList.add("hidden");
+        document.getElementById("members-chevron").textContent = "▼";
+        document.getElementById("chat-view").classList.add("hidden");
+        document.getElementById("lobby-view").classList.remove("hidden");
+    }
+
+    function selectRoomInChat(roomId) {
+        if (roomId === currentRoomId) return;
+        currentRoomId = roomId;
+        resetMessagesArea();
+        sendJson({ type: "JOIN_ROOM", roomId: roomId, pin: "" });
+    }
+
+    function openEditRoomModal(roomId) {
+        closeContextMenus();
+        var room = latestRooms.find(function (r) { return r.id === roomId; });
+        if (!room || !room.isCreator) return;
+
+        editingRoomId = room.id;
+        editingRoomPrivacy = room.privacy || "public";
+        editingRoomIconKey = room.iconKey || "gamepad";
+
+        document.getElementById("edit-room-name").value = room.name || "";
+        document.getElementById("edit-room-topic").value = room.topic || "";
+        document.getElementById("edit-room-pin").value = room.pin || "";
+
+        setEditRoomPrivacy(editingRoomPrivacy);
+        renderEditIconSelector();
+        document.getElementById("modal-edit-room").classList.remove("hidden");
+    }
+
+    function setEditRoomPrivacy(mode) {
+        editingRoomPrivacy = mode;
+        const pubBtn = document.getElementById("edit-priv-public");
+        const priBtn = document.getElementById("edit-priv-private");
+        const pinWrap = document.getElementById("edit-pin-wrapper");
+        const subtitle = document.getElementById("edit-room-subtitle");
+
+        if (mode === "private") {
+            priBtn.className = "py-2.5 px-3 rounded-2xl border border-sky-400/70 bg-sky-500/10 text-sky-300 text-xs font-bold cursor-pointer";
+            pubBtn.className = "py-2.5 px-3 rounded-2xl border border-zinc-800 bg-[#05070c] text-zinc-400 text-xs font-bold cursor-pointer";
+            pinWrap.classList.remove("hidden");
+            subtitle.textContent = "Sala privada: edita nombre, icono, descripcion y PIN (o cambiala a publica para quitar el PIN).";
+        } else {
+            pubBtn.className = "py-2.5 px-3 rounded-2xl border border-sky-400/70 bg-sky-500/10 text-sky-300 text-xs font-bold cursor-pointer";
+            priBtn.className = "py-2.5 px-3 rounded-2xl border border-zinc-800 bg-[#05070c] text-zinc-400 text-xs font-bold cursor-pointer";
+            pinWrap.classList.add("hidden");
+            subtitle.textContent = "Sala publica: sin PIN requerido (puedes volverla privada asignando un PIN de 4 digitos).";
+        }
+    }
+
+    function closeEditRoomModal() {
+        editingRoomId = null;
+        document.getElementById("modal-edit-room").classList.add("hidden");
+    }
+
+    function renderEditIconSelector() {
+        const wrap = document.getElementById("edit-icon-selector");
+        wrap.innerHTML = "";
+        ROOM_ICON_OPTIONS.forEach(function (key) {
+            const active = key === editingRoomIconKey;
+            const b = document.createElement("button");
+            b.type = "button";
+            b.innerHTML = roomIconHtml(key, "w-5 h-5", key);
+            b.onclick = function () {
+                editingRoomIconKey = key;
+                renderEditIconSelector();
+            };
+            b.className = active
+                ? "p-2 rounded-xl bg-sky-500/15 border border-sky-400 flex items-center justify-center cursor-pointer"
+                : "p-2 rounded-xl bg-[#0b0e15] hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center cursor-pointer";
+            wrap.appendChild(b);
+        });
+    }
+
+    function submitEditRoom() {
+        if (!editingRoomId) return;
+        const name = document.getElementById("edit-room-name").value.trim();
+        const topic = document.getElementById("edit-room-topic").value.trim();
+        const pin = document.getElementById("edit-room-pin").value.trim();
+
+        if (name.length < 2 || name.length > 35) {
+            showAlert("Nombre invalido", "El nombre de la sala debe tener entre 2 y 35 caracteres.");
+            return;
+        }
+
+        if (editingRoomPrivacy === "private" && !/^\d{4}$/.test(pin)) {
+            showAlert("PIN requerido", "Para una sala privada debes asignar un PIN exacto de 4 digitos.");
+            return;
+        }
+
+        sendJson({
+            type: "EDIT_ROOM",
+            roomId: editingRoomId,
+            name: name,
+            topic: topic,
+            iconKey: editingRoomIconKey,
+            privacy: editingRoomPrivacy,
+            pin: editingRoomPrivacy === "private" ? pin : ""
+        });
+        closeEditRoomModal();
+    }
+
+    function deleteRoom(roomId) {
+        closeContextMenus();
+        sendJson({ type: "DELETE_ROOM", roomId: roomId });
+    }
+
+    function kickUser(targetSessionId) {
+        closeContextMenus();
+        sendJson({
+            type: "KICK_USER",
+            roomId: currentRoomId,
+            targetSessionId: targetSessionId
+        });
+    }
+
+    function banUser(targetSessionId) {
+        closeContextMenus();
+        sendJson({
+            type: "BAN_USER",
+            roomId: currentRoomId,
+            targetSessionId: targetSessionId
+        });
+    }
+
+    function sendTextMessage() {
+        const input = document.getElementById("input-message");
+        const text = input.value.trim();
+        if (!text) return;
+
+        sendJson({
+            type: "CHAT_MESSAGE",
+            roomId: currentRoomId,
+            kind: "text",
+            content: text,
+            gifUrl: ""
+        });
+        input.value = "";
+        document.getElementById("media-picker").classList.add("hidden");
+    }
+
+    function sendGifMessage(gifUrl) {
+        sendJson({
+            type: "CHAT_MESSAGE",
+            roomId: currentRoomId,
+            kind: "gif",
+            content: "",
+            gifUrl: gifUrl
+        });
+        document.getElementById("media-picker").classList.add("hidden");
+    }
+
+    function handleMessageKey(e) {
+        if (e.key === "Enter") {
+            sendTextMessage();
+        }
+    }
+
+    function toggleMembersDropdown() {
+        const panel = document.getElementById("members-dropdown-panel");
+        const chevron = document.getElementById("members-chevron");
+        if (panel.classList.contains("hidden")) {
+            panel.classList.remove("hidden");
+            chevron.textContent = "▲";
+        } else {
+            panel.classList.add("hidden");
+            chevron.textContent = "▼";
+        }
+    }
+
+    function toggleRoomMenu(roomId) {
+        var menu = document.getElementById("room-menu-" + roomId);
+        if (!menu) return;
+        var wasHidden = menu.classList.contains("hidden");
+        closeContextMenus();
+        if (wasHidden) {
+            menu.classList.remove("hidden");
+        }
+    }
+
+    function toggleMemberMenu(sessionId) {
+        var menu = document.getElementById("member-menu-" + sessionId);
+        if (!menu) return;
+        var wasHidden = menu.classList.contains("hidden");
+        closeContextMenus();
+        if (wasHidden) {
+            menu.classList.remove("hidden");
+        }
+    }
+
+    function closeContextMenus() {
+        document.querySelectorAll("[data-context-menu]").forEach(function (el) {
+            el.classList.add("hidden");
+        });
+    }
+
+    function resetMessagesArea() {
+        const container = document.getElementById("messages-container");
+        container.innerHTML =
+            '<div class="flex justify-center">' +
+            '<span class="px-3.5 py-1 rounded-full bg-[#0d121c] border border-zinc-800 text-[11px] mono text-zinc-400">Hoy</span>' +
+            '</div>' +
+            '<div id="empty-room-state" class="text-center py-16 text-zinc-500 text-sm">' +
+            'Aun no hay mensajes en esta sala. Se el primero en escribir.' +
+            '</div>';
+    }
+
+    function appendSystemEvent(text) {
+        const empty = document.getElementById("empty-room-state");
+        if (empty) empty.remove();
+
+        const container = document.getElementById("messages-container");
+        const div = document.createElement("div");
+        div.className = "bubble-arrive flex justify-center";
+        div.innerHTML = '<span class="px-3.5 py-1 rounded-full bg-[#0e1420] border border-sky-500/25 text-xs text-sky-300">' + escapeHtml(text) + '</span>';
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function appendChatMessage(msg) {
+        const empty = document.getElementById("empty-room-state");
+        if (empty) empty.remove();
+
+        const isMine = msg.senderSessionId === mySessionId;
+        const container = document.getElementById("messages-container");
+        const wrapper = document.createElement("div");
+        wrapper.className = "bubble-arrive flex " + (isMine ? "justify-end" : "justify-start");
+
+        const bubbleClass = isMine
+            ? "max-w-[78%] rounded-3xl rounded-br-md px-4 py-2.5 bg-gradient-to-br from-sky-500 to-blue-600 text-zinc-950 shadow-[0_6px_22px_-6px_rgba(56,189,248,0.45)]"
+            : "max-w-[78%] rounded-3xl rounded-bl-md px-4 py-2.5 bg-[#101520] border border-zinc-800 text-zinc-100";
+
+        const metaClass = isMine
+            ? "text-[11px] font-bold text-zinc-950/80 mb-1 flex items-center justify-between gap-3"
+            : "text-[11px] font-bold text-sky-400 mb-1 flex items-center justify-between gap-3";
+
+        var bodyHtml = "";
+        if (msg.kind === "gif" && msg.gifUrl) {
+            bodyHtml = '<img src="' + escapeHtml(msg.gifUrl) + '" alt="GIF" class="rounded-2xl max-h-48 object-cover border border-white/10">';
+        } else {
+            bodyHtml = '<p class="text-sm break-words leading-relaxed">' + escapeHtml(msg.content) + '</p>';
+        }
+
+        wrapper.innerHTML =
+            '<div class="' + bubbleClass + '">' +
+            '<div class="' + metaClass + '">' +
+            '<span class="flex items-center gap-1.5">' + escapeHtml(msg.senderName) + flagSvgHtml(msg.senderNationality) + '<span class="font-normal opacity-80">' + escapeHtml(msg.senderNationality) + '</span></span>' +
+            '<span class="mono text-[10px] opacity-75">' + escapeHtml(msg.time || "") + '</span>' +
+            '</div>' +
+            bodyHtml +
+            '</div>';
+
+        container.appendChild(wrapper);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function renderLobbyRooms() {
+        const grid = document.getElementById("lobby-rooms-grid");
+        grid.innerHTML = "";
+        const baseRooms = latestRooms.filter(function (r) { return r.systemRoom; });
+        baseRooms.forEach(function (room) {
+            const card = document.createElement("button");
+            card.type = "button";
+            card.onclick = function () { enterChat(room.id); };
+            card.className = "text-left p-5 rounded-3xl bg-[#0b0e15] hover:bg-[#111724] border border-zinc-800/95 hover:border-sky-400/55 transition cursor-pointer group";
+            card.innerHTML =
+                '<div class="w-11 h-11 rounded-2xl bg-[#111827] border border-sky-400/25 flex items-center justify-center mb-3.5 group-hover:shadow-[0_0_16px_rgba(56,189,248,0.28)] transition">' + roomIconHtml(room.iconKey, "w-5 h-5", room.id) + '</div>' +
+                '<div class="font-display-soft font-bold text-base text-white truncate">' + escapeHtml(room.name) + '</div>' +
+                '<div class="text-xs text-zinc-400 truncate mt-0.5">' + escapeHtml(room.topic) + '</div>' +
+                '<div class="text-xs text-sky-400 mono mt-2.5">' + room.onlineCount + ' conectados</div>';
+            grid.appendChild(card);
+        });
+    }
+
+    function renderSidebarRooms() {
+        const list = document.getElementById("sidebar-rooms-list");
+        list.innerHTML = "";
+
+        const visibleRooms = latestRooms.filter(function (r) {
+            if (r.systemRoom) return true;
+            if (r.privacy !== "private") return true;
+            return Boolean(r.isCreator) || Boolean(unlockedPrivateRooms[r.id]);
+        });
+
+        const systemRooms = visibleRooms.filter(function (r) { return r.systemRoom; });
+        const customRooms = visibleRooms.filter(function (r) { return !r.systemRoom; });
+        const orderedRooms = systemRooms.concat(customRooms);
+
+        orderedRooms.forEach(function (room) {
+            const isActive = room.id === currentRoomId;
+            const canManageRoom = !room.systemRoom && Boolean(room.isCreator);
+
+            const row = document.createElement("div");
+            row.className = "relative flex items-center justify-between gap-1.5 rounded-2xl transition " + (
+                isActive
+                    ? "bg-[#111929] border border-sky-400/50 text-white shadow-[0_0_18px_-6px_rgba(56,189,248,0.35)]"
+                    : "hover:bg-[#0d121c] border border-transparent text-zinc-300"
+            );
+
+            const mainBtn = document.createElement("button");
+            mainBtn.type = "button";
+            mainBtn.onclick = function () { selectRoomInChat(room.id); };
+            mainBtn.className = "flex-1 text-left px-3 py-2.5 flex items-center justify-between gap-2 min-w-0 cursor-pointer";
+
+            const privacyTag = room.privacy === "private" ? "PIN" : "";
+            const subtitleText = room.systemRoom
+                ? room.topic
+                : "Sala personalizada creada por " + (room.creatorName || "Usuario");
+
+            mainBtn.innerHTML =
+                '<div class="flex items-center gap-2.5 min-w-0">' +
+                roomIconHtml(room.iconKey, "w-4 h-4", room.id) +
+                '<div class="min-w-0">' +
+                '<div class="font-display-soft text-sm font-semibold truncate flex items-center gap-1.5">' +
+                '<span>' + escapeHtml(room.name) + '</span>' +
+                (privacyTag ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/10 text-sky-300 border border-sky-400/30 mono">' + privacyTag + '</span>' : '') +
+                '</div>' +
+                '<div class="text-[11px] text-zinc-500 truncate">' + escapeHtml(subtitleText) + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<span class="px-2 py-0.5 rounded-full bg-[#06090f] border border-zinc-800 text-xs mono text-sky-300 shrink-0">' + room.onlineCount + '</span>';
+
+            row.appendChild(mainBtn);
+
+            if (canManageRoom) {
+                const dotsWrap = document.createElement("div");
+                dotsWrap.className = "pr-2 relative";
+                dotsWrap.onclick = function (e) { e.stopPropagation(); };
+
+                dotsWrap.innerHTML =
+                    '<button type="button" onclick="toggleRoomMenu(\'' + room.id + '\')" title="Opciones de sala" class="w-7 h-7 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center font-bold cursor-pointer">⋮</button>' +
+                    '<div id="room-menu-' + room.id + '" data-context-menu class="hidden absolute right-0 top-8 z-40 w-40 rounded-2xl bg-[#0d121c] border border-zinc-700 shadow-2xl p-1.5 space-y-1">' +
+                    '<button type="button" onclick="openEditRoomModal(\'' + room.id + '\')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-zinc-800 text-sky-300 text-xs font-bold cursor-pointer">Editar sala</button>' +
+                    '<button type="button" onclick="deleteRoom(\'' + room.id + '\')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-rose-950/70 text-rose-300 text-xs font-bold cursor-pointer">Eliminar sala</button>' +
+                    '</div>';
+
+                row.appendChild(dotsWrap);
+            }
+
+            list.appendChild(row);
+        });
+    }
+
+    function renderActiveRoomHeader() {
+        const room = latestRooms.find(function (r) { return r.id === currentRoomId; });
+        if (!room) return;
+        document.getElementById("active-room-icon").innerHTML = roomIconHtml(room.iconKey, "w-5 h-5", room.id);
+        document.getElementById("active-room-title").textContent = room.name;
+        document.getElementById("active-room-badge").textContent = "En linea " + room.onlineCount;
+        document.getElementById("active-room-topic").textContent = room.topic;
+        document.getElementById("active-room-code").textContent = "Codigo: " + room.code + (room.privacy === "private" ? " (Privada)" : " (Publica)");
+    }
+
+    function renderRoomMembers() {
+        const members = latestUsers.filter(function (u) { return u.roomId === currentRoomId; });
+        const room = latestRooms.find(function (r) { return r.id === currentRoomId; });
+        const canManageRoomMembers = room && !room.systemRoom && Boolean(room.isCreator);
+
+        document.getElementById("room-members-count").textContent = members.length;
+        const list = document.getElementById("room-members-list");
+        list.innerHTML = "";
+
+        members.forEach(function (u) {
+            const isMe = u.sessionId === mySessionId;
+            const row = document.createElement("div");
+            row.className = "relative p-3 rounded-2xl bg-[#101520] border border-zinc-800/90 flex items-center justify-between gap-2";
+
+            var rightSide = "";
+            if (isMe) {
+                rightSide = '<span class="px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-[11px] font-bold">Tu</span>';
+            } else if (canManageRoomMembers) {
+                rightSide =
+                    '<div class="relative">' +
+                    '<button type="button" onclick="toggleMemberMenu(\'' + u.sessionId + '\')" title="Opciones de integrante" class="w-7 h-7 rounded-xl hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center font-bold cursor-pointer">⋮</button>' +
+                    '<div id="member-menu-' + u.sessionId + '" data-context-menu class="hidden absolute right-0 top-8 z-40 w-44 rounded-2xl bg-[#0b0e15] border border-zinc-700 shadow-2xl p-1.5 space-y-1">' +
+                    '<button type="button" onclick="kickUser(\'' + u.sessionId + '\')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-zinc-800 text-zinc-200 text-xs font-semibold cursor-pointer">Eliminar integrante</button>' +
+                    '<button type="button" onclick="banUser(\'' + u.sessionId + '\')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-rose-950/70 text-rose-300 text-xs font-bold cursor-pointer">Banear de la sala</button>' +
+                    '</div>' +
+                    '</div>';
+            }
+
+            row.innerHTML =
+                '<div class="min-w-0">' +
+                '<div class="flex items-center gap-2">' +
+                '<span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>' +
+                '<span class="text-sm font-bold text-white truncate">' + escapeHtml(u.name) + '</span>' +
+                '</div>' +
+                '<p class="text-xs text-zinc-400 truncate pl-4 flex items-center gap-1.5 mt-0.5">' + flagSvgHtml(u.nationality) + '<span>' + escapeHtml(u.nationality) + '</span></p>' +
+                '</div>' +
+                rightSide;
+
+            list.appendChild(row);
+        });
+    }
+
+    function renderCreateIconSelector() {
+        const wrap = document.getElementById("create-icon-selector");
+        wrap.innerHTML = "";
+        ROOM_ICON_OPTIONS.forEach(function (key) {
+            const active = key === selectedRoomIconKey;
+            const b = document.createElement("button");
+            b.type = "button";
+            b.innerHTML = roomIconHtml(key, "w-5 h-5", key);
+            b.onclick = function () {
+                selectedRoomIconKey = key;
+                renderCreateIconSelector();
+            };
+            b.className = active
+                ? "p-2 rounded-xl bg-sky-500/15 border border-sky-400 flex items-center justify-center cursor-pointer"
+                : "p-2 rounded-xl bg-[#0b0e15] hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center cursor-pointer";
+            wrap.appendChild(b);
+        });
+    }
+
+    function openCreateRoomModal() {
+        selectedRoomIconKey = "gamepad";
+        setRoomPrivacy("public");
+        renderCreateIconSelector();
+        document.getElementById("modal-create-room").classList.remove("hidden");
+    }
+
+    function closeCreateRoomModal() {
+        document.getElementById("modal-create-room").classList.add("hidden");
+    }
+
+    function setRoomPrivacy(mode) {
+        selectedPrivacy = mode;
+        const pubBtn = document.getElementById("priv-public");
+        const priBtn = document.getElementById("priv-private");
+        const pinWrap = document.getElementById("pin-field-wrapper");
+
+        if (mode === "private") {
+            priBtn.className = "py-2.5 px-3 rounded-2xl border border-sky-400/70 bg-sky-500/10 text-sky-300 text-xs font-bold cursor-pointer";
+            pubBtn.className = "py-2.5 px-3 rounded-2xl border border-zinc-800 bg-[#05070c] text-zinc-400 text-xs font-bold cursor-pointer";
+            pinWrap.classList.remove("hidden");
+        } else {
+            pubBtn.className = "py-2.5 px-3 rounded-2xl border border-sky-400/70 bg-sky-500/10 text-sky-300 text-xs font-bold cursor-pointer";
+            priBtn.className = "py-2.5 px-3 rounded-2xl border border-zinc-800 bg-[#05070c] text-zinc-400 text-xs font-bold cursor-pointer";
+            pinWrap.classList.add("hidden");
+        }
+    }
+
+    function submitCreateRoom() {
+        const name = document.getElementById("new-room-name").value.trim();
+        const topic = document.getElementById("new-room-topic").value.trim();
+        const pin = document.getElementById("new-room-pin").value.trim();
+
+        if (name.length < 2 || name.length > 35) {
+            showAlert("Nombre invalido", "El nombre de la sala debe tener entre 2 y 35 caracteres.");
+            return;
+        }
+
+        if (selectedPrivacy === "private" && !/^\d{4}$/.test(pin)) {
+            showAlert("PIN requerido", "Las salas privadas requieren un PIN exacto de 4 digitos.");
+            return;
+        }
+
+        sendJson({
+            type: "CREATE_ROOM",
+            name: name,
+            topic: topic,
+            iconKey: selectedRoomIconKey,
+            privacy: selectedPrivacy,
+            pin: selectedPrivacy === "private" ? pin : ""
+        });
+        closeCreateRoomModal();
+        document.getElementById("new-room-name").value = "";
+        document.getElementById("new-room-topic").value = "";
+        document.getElementById("new-room-pin").value = "";
+    }
+
+    function openJoinCodeModal() {
+        document.getElementById("modal-join-code").classList.remove("hidden");
+    }
+
+    function closeJoinCodeModal() {
+        document.getElementById("modal-join-code").classList.add("hidden");
+    }
+
+    function submitJoinByCode() {
+        const code = document.getElementById("join-code-input").value.trim().toUpperCase();
+        const pin = document.getElementById("join-pin-input").value.trim();
+        sendJson({
+            type: "JOIN_BY_CODE",
+            code: code,
+            pin: pin
+        });
+        closeJoinCodeModal();
+        document.getElementById("join-code-input").value = "";
+        document.getElementById("join-pin-input").value = "";
+    }
+
+    function toggleMediaPicker(defaultTab) {
+        const picker = document.getElementById("media-picker");
+        if (picker.classList.contains("hidden")) {
+            picker.classList.remove("hidden");
+            switchMediaTab(defaultTab || "emojis");
+        } else {
+            picker.classList.add("hidden");
+        }
+    }
+
+    function switchMediaTab(tab) {
+        const eTab = document.getElementById("tab-emojis");
+        const gTab = document.getElementById("tab-gifs");
+        const eGrid = document.getElementById("picker-emojis-grid");
+        const gGrid = document.getElementById("picker-gifs-grid");
+
+        if (tab === "gifs") {
+            gTab.className = "py-2.5 text-sky-400 border-b-2 border-sky-400 bg-sky-500/5 cursor-pointer";
+            eTab.className = "py-2.5 text-zinc-400 hover:text-zinc-200 cursor-pointer";
+            gGrid.classList.remove("hidden");
+            gGrid.classList.add("grid");
+            eGrid.classList.add("hidden");
+            eGrid.classList.remove("grid");
+        } else {
+            eTab.className = "py-2.5 text-sky-400 border-b-2 border-sky-400 bg-sky-500/5 cursor-pointer";
+            gTab.className = "py-2.5 text-zinc-400 hover:text-zinc-200 cursor-pointer";
+            eGrid.classList.remove("hidden");
+            eGrid.classList.add("grid");
+            gGrid.classList.add("hidden");
+            gGrid.classList.remove("grid");
+        }
+    }
+
+    function initMediaItems() {
+        const eGrid = document.getElementById("picker-emojis-grid");
+        EMOJIS.forEach(function (em) {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.textContent = em;
+            b.className = "p-1 rounded-xl hover:bg-zinc-800 cursor-pointer";
+            b.onclick = function () {
+                const inp = document.getElementById("input-message");
+                inp.value = inp.value + em;
+                inp.focus();
+            };
+            eGrid.appendChild(b);
+        });
+
+        const gGrid = document.getElementById("picker-gifs-grid");
+        GIFS.forEach(function (g) {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.className = "rounded-2xl overflow-hidden border border-zinc-800 hover:border-sky-400 cursor-pointer bg-[#06090f]";
+            b.innerHTML = '<img src="' + escapeHtml(g.url) + '" alt="' + escapeHtml(g.label) + '" class="w-full h-20 object-cover">';
+            b.onclick = function () { sendGifMessage(g.url); };
+            gGrid.appendChild(b);
+        });
+    }
+
+    function showAlert(title, body) {
+        document.getElementById("alert-title").textContent = title;
+        document.getElementById("alert-body").textContent = body;
+        document.getElementById("modal-alert").classList.remove("hidden");
+    }
+
+    function closeAlertModal() {
+        document.getElementById("modal-alert").classList.add("hidden");
+    }
+
+    function openNewWindow() {
+        window.open(window.location.href, "_blank", "width=1280,height=820");
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    updateLobbyFlagPreview();
+    renderCreateIconSelector();
+    initMediaItems();
+    connectSocket();
+</script>
+</body>
+</html>
